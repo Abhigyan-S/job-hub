@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Abhigyan — Job Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f8f9fb;
+  --surface: #ffffff;
+  --surface2: #f1f3f7;
+  --surface3: #e8ecf2;
+  --border: #e2e6ed;
+  --border2: #c8cfd9;
+  --text: #1a1d23;
+  --muted: #6b7280;
+  --muted2: #9ca3af;
+  --accent: #2563eb;
+  --accent-light: #eff6ff;
+  --green: #16a34a;
+  --green-light: #f0fdf4;
+  --red: #dc2626;
+  --red-light: #fef2f2;
+  --amber: #d97706;
+  --amber-light: #fffbeb;
+  --purple: #7c3aed;
+  --purple-light: #f5f3ff;
+  --teal: #0d9488;
+  --teal-light: #f0fdfa;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.5; }
+
+/* NAV */
+.nav { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 24px; height: 56px; display: flex; align-items: center; gap: 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+.logo { font-size: 16px; font-weight: 700; color: var(--accent); letter-spacing: -0.3px; white-space: nowrap; }
+.nav-tabs { display: flex; gap: 2px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 3px; }
+.nav-tab { padding: 5px 16px; border-radius: 5px; border: none; background: transparent; color: var(--muted); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+.nav-tab:hover { color: var(--text); background: var(--surface); }
+.nav-tab.active { background: var(--surface); color: var(--accent); font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.nav-right { margin-left: auto; display: flex; gap: 20px; align-items: center; }
+.hstat { text-align: center; }
+.hstat-val { font-size: 18px; font-weight: 700; color: var(--text); line-height: 1; }
+.hstat-lbl { font-size: 10px; color: var(--muted2); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.06em; }
+.worker-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--red); display: inline-block; margin-right: 5px; }
+.worker-dot.ok { background: var(--green); }
+.worker-cfg { font-size: 12px; color: var(--muted); cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: 500; padding: 5px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); transition: all 0.15s; }
+.worker-cfg:hover { border-color: var(--border2); color: var(--text); }
+
+/* PAGES */
+.page { display: none; }
+.page.active { display: block; animation: fadeIn 0.15s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+/* PIPELINE */
+.pipe-strip { padding: 12px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; background: var(--surface); }
+.pipe-bar { flex: 1; height: 6px; border-radius: 6px; overflow: hidden; display: flex; gap: 2px; background: var(--surface3); }
+.pipe-seg { height: 100%; border-radius: 3px; transition: flex 0.4s ease; }
+.pipe-seg.applied { background: var(--teal); }
+.pipe-seg.interviewing { background: var(--accent); }
+.pipe-seg.offer { background: var(--green); }
+.pipe-seg.rejected { background: var(--red); }
+.pipe-seg.declined { background: var(--muted2); }
+.pipe-legend { display: flex; gap: 14px; flex-shrink: 0; }
+.pipe-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
+.pipe-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+/* STATS */
+.stats-row { display: flex; border-bottom: 1px solid var(--border); background: var(--surface); }
+.stat-card { flex: 1; padding: 16px 20px; border-right: 1px solid var(--border); }
+.stat-card:last-child { border-right: none; }
+.stat-val { font-size: 28px; font-weight: 700; line-height: 1; color: var(--text); }
+.stat-lbl { font-size: 11px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 500; }
+.c-accent .stat-val { color: var(--accent); }
+.c-teal .stat-val { color: var(--teal); }
+.c-green .stat-val { color: var(--green); }
+.c-red .stat-val { color: var(--red); }
+.c-gray .stat-val { color: var(--muted); }
+.c-amber .stat-val { color: var(--amber); }
+.c-purple .stat-val { color: var(--purple); }
+
+/* CONTROLS */
+.controls { padding: 12px 24px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; border-bottom: 1px solid var(--border); background: var(--surface); }
+.search { position: relative; flex: 1; min-width: 180px; max-width: 280px; }
+.search input { width: 100%; background: var(--surface2); border: 1px solid var(--border); color: var(--text); font-family: inherit; font-size: 13px; padding: 7px 10px 7px 32px; border-radius: 7px; outline: none; transition: border-color 0.15s; }
+.search input:focus { border-color: var(--accent); background: var(--surface); }
+.search::before { content: '⌕'; position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--muted2); font-size: 15px; }
+.filters { display: flex; gap: 4px; flex-wrap: wrap; }
+.filt { padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-family: inherit; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+.filt:hover { border-color: var(--border2); color: var(--text); }
+.filt.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn { font-family: inherit; font-size: 13px; font-weight: 500; padding: 7px 14px; border-radius: 7px; cursor: pointer; border: 1px solid var(--border); background: var(--surface); color: var(--text); transition: all 0.15s; }
+.btn:hover { background: var(--surface2); border-color: var(--border2); }
+.btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn.primary:hover { background: #1d4ed8; }
+.btn.sm { padding: 5px 10px; font-size: 12px; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* TABLE */
+.tbl-wrap { overflow-x: auto; padding: 0 24px 60px; background: var(--bg); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 12px; }
+thead th { text-align: left; padding: 8px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); border-bottom: 1px solid var(--border); white-space: nowrap; cursor: pointer; font-weight: 600; }
+thead th:hover { color: var(--text); }
+tbody tr.app-row { border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.1s; background: var(--surface); }
+tbody tr.app-row:hover td { background: var(--accent-light); }
+tbody tr.app-row.expanded td { background: var(--accent-light); }
+tbody tr.hidden { display: none; }
+td { padding: 11px 12px; vertical-align: middle; }
+.td-num { color: var(--muted2); font-size: 11px; width: 32px; }
+.td-co { font-weight: 600; font-size: 14px; color: var(--text); }
+.td-role { color: var(--muted); max-width: 240px; }
+.td-role span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.td-loc { color: var(--muted); font-size: 12px; max-width: 140px; }
+.td-loc span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.td-sal { font-size: 12px; color: var(--muted); max-width: 140px; }
+.td-sal span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.td-date { font-size: 11px; color: var(--muted2); white-space: nowrap; }
+.chev { font-size: 10px; color: var(--muted2); transition: transform 0.2s; display: inline-block; margin-left: 6px; }
+.expanded .chev { transform: rotate(90deg); }
+
+/* STATUS */
+.ssel { background: transparent; border: none; font-size: 11px; cursor: pointer; outline: none; padding: 3px 8px; border-radius: 20px; font-weight: 600; appearance: none; font-family: inherit; }
+.ssel.applied { background: var(--teal-light); color: var(--teal); }
+.ssel.interviewing { background: var(--accent-light); color: var(--accent); }
+.ssel.offer { background: var(--green-light); color: var(--green); }
+.ssel.rejected { background: var(--red-light); color: var(--red); }
+.ssel.declined { background: var(--surface2); color: var(--muted); }
+
+/* FIT */
+.fit { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; white-space: nowrap; font-weight: 500; }
+.fit::before { content: ''; display: block; width: 7px; height: 7px; border-radius: 50%; }
+.fit-vs::before { background: var(--green); }
+.fit-s::before { background: var(--teal); }
+.fit-g::before { background: var(--amber); }
+.fit-p::before { background: #f97316; }
+.fit-po::before { background: var(--red); }
+.fit-na::before { background: var(--muted2); }
+
+/* TECH */
+.tech { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+.tech-yes { background: var(--red-light); color: var(--red); }
+.tech-maybe { background: var(--amber-light); color: var(--amber); }
+.tech-no { background: var(--green-light); color: var(--green); }
+
+/* URGENCY */
+.urgency-badge { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 10px; font-weight: 700; background: var(--amber-light); color: var(--amber); margin-left: 6px; }
+
+/* DETAIL ROW */
+tr.det-row { display: none; }
+tr.det-row.open { display: table-row; }
+tr.det-row td { padding: 0; border-bottom: 1px solid var(--border); }
+.det-inner { padding: 18px 18px 4px 56px; background: var(--surface2); display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+.det-sec { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+.det-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; }
+.det-val { font-size: 13px; color: var(--text); line-height: 1.6; }
+.det-edit { font-size: 13px; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 7px 9px; width: 100%; font-family: inherit; outline: none; resize: vertical; min-height: 64px; transition: border-color 0.15s; }
+.det-edit:focus { border-color: var(--accent); }
+select.det-edit { min-height: unset; resize: none; height: 34px; }
+input.det-edit { min-height: unset; resize: none; height: 34px; }
+.det-actions { display: flex; gap: 8px; align-items: center; padding: 10px 18px 14px 56px; background: var(--surface2); flex-wrap: wrap; border-top: 1px solid var(--border); }
+.det-ts { font-size: 11px; color: var(--muted2); margin-left: auto; }
+
+/* MODAL */
+.modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 500; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+.modal-bg.open { display: flex; }
+.modal { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px; width: 90%; max-width: 520px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+.modal-title { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 18px; }
+.fg { margin-bottom: 12px; }
+.fg label { display: block; font-size: 11px; color: var(--muted); margin-bottom: 5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+.fg input, .fg textarea, .fg select { width: 100%; background: var(--surface2); border: 1px solid var(--border); color: var(--text); font-family: inherit; font-size: 13px; padding: 8px 10px; border-radius: 7px; outline: none; resize: vertical; transition: border-color 0.15s; }
+.fg input:focus, .fg textarea:focus, .fg select:focus { border-color: var(--accent); background: var(--surface); }
+.fg2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.modal-foot { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
+
+/* APPLY PAGE */
+.apply-wrap { max-width: 860px; margin: 0 auto; padding: 32px 24px; }
+.apply-hero { margin-bottom: 24px; }
+.apply-hero-title { font-size: 28px; font-weight: 700; color: var(--text); line-height: 1.2; }
+.apply-hero-title span { color: var(--accent); }
+.apply-hero-sub { color: var(--muted); font-size: 14px; margin-top: 6px; line-height: 1.6; }
+
+.worker-warn { background: #fffbeb; border: 1px solid #fcd34d; border-radius: 10px; padding: 14px 16px; margin-bottom: 20px; display: none; }
+.worker-warn.show { display: flex; gap: 12px; align-items: flex-start; }
+.worker-warn-icon { font-size: 16px; flex-shrink: 0; }
+.worker-warn-text { font-size: 12px; color: var(--amber); line-height: 1.6; }
+.worker-warn-text a { color: var(--accent); text-decoration: underline; cursor: pointer; }
+
+.input-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 22px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+.ic-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 14px; font-weight: 600; }
+.ic-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+@media(max-width:600px){ .ic-grid { grid-template-columns: 1fr; } }
+.gen-row { display: flex; gap: 10px; align-items: center; margin-top: 6px; flex-wrap: wrap; }
+.spin { display: none; width: 16px; height: 16px; border: 2px solid var(--surface3); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.gen-status { font-size: 12px; color: var(--muted); }
+
+/* RESULTS */
+.results { display: none; margin-top: 20px; }
+.results.show { display: block; animation: fadeIn 0.3s ease; }
+
+/* FIT CARD */
+.fit-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 22px; margin-bottom: 16px; display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: start; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+.fit-score-circle { width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-direction: column; flex-shrink: 0; border: 3px solid var(--accent); }
+.fit-score-num { font-size: 26px; font-weight: 700; color: var(--accent); line-height: 1; }
+.fit-score-pct { font-size: 9px; color: var(--muted); margin-top: 1px; }
+.fit-verdict { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.fit-summary { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 14px; }
+.fit-pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+@media(max-width:600px){ .fit-pros-cons { grid-template-columns: 1fr; } }
+.fit-col-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; font-weight: 600; }
+.fit-col-title.pro { color: var(--green); }
+.fit-col-title.con { color: var(--red); }
+.fit-point { display: flex; gap: 7px; align-items: flex-start; margin-bottom: 6px; font-size: 12px; color: var(--muted); line-height: 1.5; }
+.fit-point::before { content: ''; display: block; width: 5px; height: 5px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+.fit-point.pro::before { background: var(--green); }
+.fit-point.con::before { background: var(--red); }
+.fit-gaps { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 8px; padding: 12px 14px; }
+.fit-gaps-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #ea580c; margin-bottom: 6px; font-weight: 600; }
+.fit-gaps-text { font-size: 12px; color: #9a3412; line-height: 1.6; }
+
+/* OUTPUT TABS */
+.out-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+.out-tabs { display: flex; border-bottom: 1px solid var(--border); overflow-x: auto; background: var(--surface2); }
+.out-tab { flex-shrink: 0; padding: 11px 16px; font-size: 12px; font-weight: 500; color: var(--muted); cursor: pointer; transition: all 0.15s; border-bottom: 2px solid transparent; }
+.out-tab:hover { color: var(--text); }
+.out-tab.active { color: var(--accent); border-bottom-color: var(--accent); background: var(--surface); }
+.out-pane { display: none; padding: 18px; }
+.out-pane.active { display: block; }
+.out-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 14px; font-size: 13px; line-height: 1.8; color: var(--text); white-space: pre-wrap; min-height: 140px; max-height: 320px; overflow-y: auto; }
+.out-actions { display: flex; gap: 8px; margin-top: 10px; justify-content: flex-end; }
+
+/* INTERVIEW PREP */
+.prep-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 10px; }
+.prep-q { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.prep-hint { font-size: 12px; color: var(--muted); line-height: 1.6; }
+.prep-type { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; font-weight: 600; }
+.prep-type.behavioral { color: var(--teal); }
+.prep-type.technical { color: var(--amber); }
+.prep-type.situational { color: var(--purple); }
+
+/* KEYWORDS */
+.kw-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+.kw { background: var(--purple-light); color: var(--purple); border: 1px solid #ddd6fe; font-size: 11px; padding: 4px 10px; border-radius: 20px; font-weight: 500; }
+
+/* DOWNLOAD */
+.dl-section { background: var(--green-light); border: 1px solid #bbf7d0; border-radius: 12px; padding: 18px 20px; margin-bottom: 16px; display: none; }
+.dl-section.show { display: block; animation: fadeIn 0.2s ease; }
+.dl-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--green); margin-bottom: 12px; font-weight: 600; }
+.dl-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.dl-note { font-size: 11px; color: var(--muted); margin-top: 10px; line-height: 1.5; }
+
+/* SAVE BAR */
+.save-bar { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; margin-bottom: 16px; display: none; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+.save-bar.show { display: block; animation: fadeIn 0.2s ease; }
+.save-bar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 12px; font-weight: 600; }
+.save-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+.save-ok { font-size: 12px; color: var(--green); margin-top: 8px; display: none; font-weight: 500; }
+
+/* TOAST */
+.toast { position: fixed; bottom: 24px; right: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 18px; font-size: 13px; color: var(--text); z-index: 999; transform: translateY(80px); opacity: 0; transition: all 0.25s ease; pointer-events: none; box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.ok { border-color: #bbf7d0; color: var(--green); }
+.toast.err { border-color: #fecaca; color: var(--red); }
+
+/* WORKER CONFIG */
+.wcfg-panel { display: none; position: absolute; top: 60px; right: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; z-index: 300; width: 360px; box-shadow: 0 16px 48px rgba(0,0,0,0.12); }
+.wcfg-panel.open { display: block; animation: fadeIn 0.15s ease; }
+.wcfg-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 8px; font-weight: 600; }
+.wcfg-desc { font-size: 12px; color: var(--muted); line-height: 1.6; margin-bottom: 12px; }
+.wcfg-inp-row { display: flex; gap: 8px; }
+.wcfg-inp { flex: 1; background: var(--surface2); border: 1px solid var(--border); color: var(--text); font-size: 12px; padding: 7px 10px; border-radius: 6px; outline: none; font-family: monospace; transition: border-color 0.15s; }
+.wcfg-inp:focus { border-color: var(--accent); }
+.wcfg-ok { font-size: 11px; color: var(--green); margin-top: 8px; display: none; font-weight: 500; }
+.wcfg-guide { font-size: 11px; color: var(--muted); margin-top: 10px; line-height: 1.7; border-top: 1px solid var(--border); padding-top: 10px; }
+.wcfg-guide a { color: var(--accent); }
+
+/* FOOTER */
+.footer { border-top: 1px solid var(--border); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; color: var(--muted2); font-size: 11px; flex-wrap: wrap; gap: 6px; background: var(--surface); }
+
+/* EMPTY */
+#empty { text-align: center; padding: 48px; color: var(--muted2); font-size: 13px; }
+</style>
+</head>
+<body>
+
+<nav class="nav" style="position:relative">
+  <div class="logo">Abhigyan's Job Hub</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('tracker',this)">Tracker</button>
+    <button class="nav-tab" onclick="showPage('apply',this)">Apply</button>
+  </div>
+  <div class="nav-right">
+    <div class="hstat"><div class="hstat-val" id="h-total">0</div><div class="hstat-lbl">Total</div></div>
+    <div class="hstat"><div class="hstat-val" id="h-active">0</div><div class="hstat-lbl">Active</div></div>
+    <div class="hstat"><div class="hstat-val" id="h-rate">—</div><div class="hstat-lbl">Response</div></div>
+    <div class="worker-cfg" onclick="toggleWcfg()"><span class="worker-dot" id="wdot"></span>AI Config</div>
+  </div>
+  <div class="wcfg-panel" id="wcfg-panel">
+    <div class="wcfg-title">Cloudflare Worker URL</div>
+    <div class="wcfg-desc">Paste your Worker URL to enable AI generation. Free setup — see the guide below or download WORKER_SETUP.md from the repo.</div>
+    <div class="wcfg-inp-row">
+      <input class="wcfg-inp" id="wcfg-inp" type="url" placeholder="https://my-worker.workers.dev"/>
+      <button class="btn sm primary" onclick="saveWorker()">Save</button>
+    </div>
+    <div class="wcfg-ok" id="wcfg-ok">Connected.</div>
+    <div class="wcfg-guide">
+      <strong style="color:var(--text)">Quick setup (3 min, free):</strong><br>
+      1. Go to <a href="https://workers.cloudflare.com" target="_blank">workers.cloudflare.com</a> → sign up<br>
+      2. Create Worker → paste code from worker.js in your repo<br>
+      3. Settings → Variables → add <code>ANTHROPIC_KEY</code> = your key from <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a><br>
+      4. Copy the Worker URL and paste it above
+    </div>
+  </div>
+</nav>
+
+<!-- ══ TRACKER ══ -->
+<div class="page active" id="page-tracker">
+  <div class="pipe-strip">
+    <div class="pipe-bar" id="pipe-bar"></div>
+    <div class="pipe-legend">
+      <div class="pipe-item"><div class="pipe-dot" style="background:var(--teal)"></div>Applied</div>
+      <div class="pipe-item"><div class="pipe-dot" style="background:var(--lime)"></div>Interviewing</div>
+      <div class="pipe-item"><div class="pipe-dot" style="background:var(--violet)"></div>Offer</div>
+      <div class="pipe-item"><div class="pipe-dot" style="background:var(--red)"></div>Rejected</div>
+      <div class="pipe-item"><div class="pipe-dot" style="background:var(--muted)"></div>Declined</div>
+    </div>
+  </div>
+  <div class="stats-row">
+    <div class="stat-card c-lime"><div class="stat-val" id="s-total">0</div><div class="stat-lbl">Total</div></div>
+    <div class="stat-card c-teal"><div class="stat-val" id="s-applied">0</div><div class="stat-lbl">Applied</div></div>
+    <div class="stat-card c-lime"><div class="stat-val" id="s-inter">0</div><div class="stat-lbl">Interviewing</div></div>
+    <div class="stat-card c-violet"><div class="stat-val" id="s-offer">0</div><div class="stat-lbl">Offers</div></div>
+    <div class="stat-card c-red"><div class="stat-val" id="s-rej">0</div><div class="stat-lbl">Rejected</div></div>
+    <div class="stat-card c-muted"><div class="stat-val" id="s-dec">0</div><div class="stat-lbl">Declined</div></div>
+    <div class="stat-card c-amber"><div class="stat-val" id="s-strong">0</div><div class="stat-lbl">Strong+ Fit</div><div class="stat-sub" id="s-salrange"></div></div>
+  </div>
+  <div class="controls">
+    <div class="search"><input type="text" id="search" placeholder="Search company, role, location…" oninput="applyFilters()"></div>
+    <div class="filters">
+      <button class="filt on" onclick="setF('all',this)">All</button>
+      <button class="filt" onclick="setF('applied',this)">Applied</button>
+      <button class="filt" onclick="setF('interviewing',this)">Interviewing</button>
+      <button class="filt" onclick="setF('offer',this)">Offer</button>
+      <button class="filt" onclick="setF('rejected',this)">Rejected</button>
+      <button class="filt" onclick="setF('declined',this)">Declined</button>
+    </div>
+    <button class="btn primary" style="margin-left:auto" onclick="openAdd()">+ Add</button>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr>
+        <th onclick="sortBy('_i')">#</th>
+        <th onclick="sortBy('company')">Company</th>
+        <th onclick="sortBy('role')">Role</th>
+        <th onclick="sortBy('location')">Location</th>
+        <th onclick="sortBy('status')">Status</th>
+        <th onclick="sortBy('fit')">Fit</th>
+        <th>Salary</th>
+        <th>Tech</th>
+        <th onclick="sortBy('updatedAt')">Updated</th>
+      </tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div style="text-align:center;padding:48px;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:12px;display:none" id="empty">No applications match.</div>
+  </div>
+</div>
+
+<!-- ══ APPLY ══ -->
+<div class="page" id="page-apply">
+  <div class="apply-wrap">
+    <div class="apply-hero">
+      <div class="apply-hero-title" style="font-family:'Inter',sans-serif">Apply <span>smarter.</span></div>
+      <div class="apply-hero-sub">Paste any job description. Get a full fit analysis, tailored resume bullets, cover letter, outreach email, interview prep, and downloadable Word documents — instantly.</div>
+    </div>
+
+    <div class="worker-warn" id="worker-warn">
+      <div class="worker-warn-icon">⚠</div>
+      <div class="worker-warn-text">AI generation needs a Cloudflare Worker configured. <a onclick="toggleWcfg()">Click here to set it up</a> — it takes 3 minutes and is completely free. See WORKER_SETUP.md in your repo for the guide.</div>
+    </div>
+
+    <div class="input-card">
+      <div class="ic-title">Job Details</div>
+      <div class="ic-grid">
+        <div class="fg" style="margin:0"><label>Company</label><input id="a-co" placeholder="e.g. Google"/></div>
+        <div class="fg" style="margin:0"><label>Role Title</label><input id="a-role" placeholder="e.g. Strategy Associate"/></div>
+        <div class="fg" style="margin:0"><label>Location</label><input id="a-loc" placeholder="e.g. Boston, MA (Hybrid)"/></div>
+        <div class="fg" style="margin:0"><label>Salary (if listed)</label><input id="a-sal" placeholder="e.g. $120,000–$150,000"/></div>
+      </div>
+      <div class="fg"><label>Job Description</label><textarea id="a-jd" style="min-height:160px" placeholder="Paste the full job description here — responsibilities, requirements, everything. The more complete it is, the better the output."></textarea></div>
+      <div class="gen-row">
+        <button class="btn primary" id="gen-btn" onclick="generate()">Generate everything</button>
+        <div class="spin" id="spin"></div>
+        <div class="gen-status" id="gen-status"></div>
+        <span id="gen-err" style="font-size:11px;color:var(--red);font-family:'JetBrains Mono',monospace"></span>
+      </div>
+    </div>
+
+    <!-- FIT ANALYSIS -->
+    <div class="results" id="results">
+      <div class="fit-card" id="fit-card">
+        <div class="fit-score-circle" id="fit-circle">
+          <div class="fit-score-num" id="fit-num">—</div>
+          <div class="fit-score-pct">/ 100</div>
+        </div>
+        <div class="fit-right">
+          <div class="fit-verdict" id="fit-verdict"></div>
+          <div class="fit-summary" id="fit-summary"></div>
+          <div class="fit-pros-cons">
+            <div>
+              <div class="fit-col-title pro">What works for you</div>
+              <div id="fit-pros"></div>
+            </div>
+            <div>
+              <div class="fit-col-title con">Watch points</div>
+              <div id="fit-cons"></div>
+            </div>
+          </div>
+          <div class="fit-gaps" id="fit-gaps-wrap">
+            <div class="fit-gaps-title">Gaps to address</div>
+            <div class="fit-gaps-text" id="fit-gaps"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="out-card">
+        <div class="out-tabs">
+          <div class="out-tab active" onclick="switchTab('resume',this)">Resume Bullets</div>
+          <div class="out-tab" onclick="switchTab('cover',this)">Cover Letter</div>
+          <div class="out-tab" onclick="switchTab('email',this)">Outreach Email</div>
+          <div class="out-tab" onclick="switchTab('prep',this)">Interview Prep</div>
+          <div class="out-tab" onclick="switchTab('kw',this)">ATS Keywords</div>
+        </div>
+        <div class="out-pane active" id="pane-resume">
+          <div class="out-box" id="box-resume"></div>
+          <div class="out-actions">
+            <span style="font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace">SAP bullets tailored to this JD</span>
+            <button class="btn sm" onclick="copyBox('box-resume',this)">Copy</button>
+          </div>
+        </div>
+        <div class="out-pane" id="pane-cover">
+          <div class="out-box" id="box-cover"></div>
+          <div class="out-actions"><button class="btn sm" onclick="copyBox('box-cover',this)">Copy</button></div>
+        </div>
+        <div class="out-pane" id="pane-email">
+          <div class="out-box" id="box-email"></div>
+          <div class="out-actions"><button class="btn sm" onclick="copyBox('box-email',this)">Copy</button></div>
+        </div>
+        <div class="out-pane" id="pane-prep">
+          <div id="box-prep"></div>
+        </div>
+        <div class="out-pane" id="pane-kw">
+          <div class="kw-wrap" id="box-kw"></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:12px;font-family:'JetBrains Mono',monospace">Include these naturally in your resume and cover letter to pass ATS filters.</div>
+        </div>
+      </div>
+
+      <div class="dl-section" id="dl-section">
+        <div class="dl-title">Download Word Documents</div>
+        <div class="dl-row">
+          <button class="btn primary" id="dl-res" onclick="dlResume()">↓ Resume (.docx)</button>
+          <button class="btn" id="dl-cl" onclick="dlCover()">↓ Cover Letter (.docx)</button>
+        </div>
+        <div class="dl-note">Your exact Calibri format — all 5 roles including Morae Global, tailored SAP bullets swapped in. Opens directly in Word, ready to upload to any job portal.</div>
+      </div>
+
+      <div class="save-bar" id="save-bar">
+        <div class="save-bar-title">Save to Tracker</div>
+        <div class="save-row">
+          <div class="fg" style="margin:0;min-width:130px"><label>Status</label><select id="sv-status"><option value="Applied">Applied</option><option value="Drafting">Drafting</option></select></div>
+          <div class="fg" style="margin:0;flex:1;min-width:180px"><label>Notes</label><input id="sv-notes" placeholder="Any notes…"/></div>
+          <button class="btn primary" style="align-self:flex-end" onclick="saveToTracker()">Save →</button>
+        </div>
+        <div class="save-ok" id="save-ok">Saved to tracker.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD MODAL -->
+<div class="modal-bg" id="add-modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-title">Add Application</div>
+    <div class="fg2">
+      <div class="fg"><label>Company *</label><input id="m-co" placeholder="e.g. Stripe"/></div>
+      <div class="fg"><label>Role *</label><input id="m-role" placeholder="e.g. Strategy Associate"/></div>
+    </div>
+    <div class="fg2">
+      <div class="fg"><label>Location</label><input id="m-loc" placeholder="e.g. New York, NY"/></div>
+      <div class="fg"><label>Salary Range</label><input id="m-sal" placeholder="e.g. $110,000–$140,000"/></div>
+    </div>
+    <div class="fg2">
+      <div class="fg"><label>Status</label>
+        <select id="m-st"><option value="Applied">Applied</option><option value="Interviewing">Interviewing</option><option value="Offer">Offer</option><option value="Rejected">Rejected</option><option value="Declined">Declined</option></select>
+      </div>
+      <div class="fg"><label>Fit Assessment</label>
+        <select id="m-fit"><option value="Very Strong Fit">Very Strong Fit</option><option value="Strong Fit">Strong Fit</option><option value="Good Fit" selected>Good Fit</option><option value="Partial Fit">Partial Fit</option><option value="Poor Fit">Poor Fit</option></select>
+      </div>
+    </div>
+    <div class="fg2">
+      <div class="fg"><label>Tech Screen?</label><select id="m-tech"><option value="No">No</option><option value="Possibly">Possibly</option><option value="Yes">Yes</option></select></div>
+      <div class="fg"><label>Interview Date</label><input id="m-idate" type="date"/></div>
+    </div>
+    <div class="fg"><label>Application Deadline</label><input id="m-deadline" type="date"/></div>
+    <div class="fg"><label>Notes / Next Steps</label><textarea id="m-notes" style="min-height:70px" placeholder="e.g. Cover letter submitted. Recruiter is Sarah."></textarea></div>
+    <div class="fg"><label>Key Gaps to Prepare</label><textarea id="m-gaps" style="min-height:60px" placeholder="e.g. Case interview prep needed."></textarea></div>
+    <div class="modal-foot">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn primary" onclick="addApp()">Add Application</button>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <span id="footer-txt">Loading…</span>
+  <span>Abhigyan Singhal — 2025/2026</span>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG ──
+const PROFILE = `Abhigyan Singhal. MBA Candidate, Babson College — Business Analytics & Machine Learning (STEM), GPA 3.6, Class of 2025. F-1 STEM OPT (3-year, available June 2026, no sponsorship to start).
+
+Experience:
+- Sales Development Intern, SAP America, Boston (Aug 2025–present): 50+ enterprise accounts, ZoomInfo intent signals, AI-powered outreach workflows cutting prep time 30%, engagement response rates up 25%, adopted by broader sales team.
+- Strategy Consultant, AI Fund – Babson (Jan–May 2025): Commercial due diligence for 2 early-stage AI ventures, market sizing, competitive dynamics, presented to fund partners.
+- CEO, Cafe Totaram (May 2023–Aug 2024): Full P&L, 5,000+ monthly customers, 20-person team. 20% YoY revenue growth, 15% margin improvement, 12% procurement cost reduction, 20% waste reduction.
+- Consultant, Samvad Partners (Apr 2021–Apr 2023): 13+ M&A and PE/VC transactions, $5M+ combined deal value. Commercial and legal due diligence, investment analyses, PE client recommendations. Structured $1M+ convertible notes, reduced client liability exposure 15%, accelerated transaction turnaround 30%.
+- Legal & Project Management Associate, Morae Global (Jun 2019–Jan 2021): US/UK PE due diligence workstreams, 200+ contracts per engagement. Promoted from contract analysis to project management.
+
+Education: LLB Christ University Bangalore (2019). MBA Babson (2026).
+Skills: ML, SQL basics, Python basics, Excel, PowerPoint, Outreach.io, ZoomInfo, CRM, M&A due diligence, transaction advisory, deal structuring, investment analysis, stakeholder management.
+Writing tone: Genuine, low-pressure, professional. No em dashes.`;
+
+// ── DATA ──
+const RAW = [
+  {company:"Humana",role:"Corporate Strategy Analyst",location:"Louisville, KY / Arlington, VA",status:"Rejected",fit:"Strong Fit",salary:"—",tech:"No",techNotes:"Strategy case interviews likely.",gaps:"Healthcare sector knowledge. Case interviews.",notes:"Rejection received. Relocation required. Reports to CSO.",interviewDate:"",deadline:""},
+  {company:"Blackstone",role:"Strategic Planning & Analysis Associate (HR-SIG)",location:"New York, NY",status:"Applied",fit:"Good Fit",salary:"—",tech:"No",techNotes:"Behavioural + case. Operational program management.",gaps:"Anaplan / Jira. Workforce planning specifics.",notes:"Internal ops role. Strong brand exposure.",interviewDate:"",deadline:""},
+  {company:"OpenGov",role:"Strategy & Pricing Analyst",location:"Remote / Hybrid",status:"Applied",fit:"Strong Fit",salary:"—",tech:"Possibly",techNotes:"Take-home pricing case. SQL possible.",gaps:"SaaS pricing. Looker / BI tools.",notes:"Cover letter submitted. GovTech / SaaS focus.",interviewDate:"",deadline:""},
+  {company:"Charlie Health",role:"Commercial Strategy Analyst",location:"New York, NY",status:"Rejected",fit:"Strong Fit",salary:"—",tech:"No",techNotes:"Behavioural + case.",gaps:"Healthcare claims data. Insurance contracting.",notes:"Rejection received. Must be within 45 min of NYC.",interviewDate:"",deadline:""},
+  {company:"Charlie Health",role:"Commercial Strategy Associate",location:"New York, NY",status:"Applied",fit:"Strong Fit",salary:"—",tech:"No",techNotes:"Same role, different posting.",gaps:"Healthcare claims data.",notes:"Second Charlie Health application — newer posting.",interviewDate:"",deadline:""},
+  {company:"PwC",role:"Fit for Growth AI Strategy Senior Associate",location:"Multiple US offices",status:"Rejected",fit:"Partial Fit",salary:"—",tech:"Yes",techNotes:"Agentic AI / LLM technical questions.",gaps:"LangChain / LlamaIndex experience.",notes:"Rejection received. F-1 STEM OPT disclosed.",interviewDate:"",deadline:""},
+  {company:"Ropes & Gray",role:"Strategy Analyst / Senior Analyst",location:"Boston, MA",status:"Applied",fit:"Strong Fit",salary:"—",tech:"No",techNotes:"Writing sample and analytical exercise.",gaps:"Professional services experience.",notes:"Boston-based. Legal background is biggest differentiator.",interviewDate:"",deadline:""},
+  {company:"Headway",role:"Senior Business Development Associate",location:"Remote",status:"Rejected",fit:"Strong Fit",salary:"$90,440–$133,000",tech:"Possibly",techNotes:"Take-home GTM case.",gaps:"Healthcare / payor partnership experience.",notes:"Cover letter submitted. Mission-driven org.",interviewDate:"",deadline:""},
+  {company:"Whatnot",role:"Commerce Strategy & Operations",location:"NY / SF / Phoenix / LA",status:"Rejected",fit:"Good Fit",salary:"$100,000–$150,000",tech:"Possibly",techNotes:"SQL test possible.",gaps:"Marketplace ops. Looker / Sigma.",notes:"Rejection received Apr 3.",interviewDate:"",deadline:""},
+  {company:"Mastercard",role:"Consultant, Advisors & Consulting Services",location:"Multiple US offices",status:"Rejected",fit:"Strong Fit",salary:"$97,000–$139,000",tech:"Yes",techNotes:"Structured case interviews — MBB level.",gaps:"Payments / fintech. Case interview prep.",notes:"Rejection received Apr 2026. Cover letter submitted.",interviewDate:"",deadline:""},
+  {company:"Figure AI",role:"Data Strategy Associate",location:"San Jose, CA",status:"Applied",fit:"Good Fit",salary:"—",tech:"No",techNotes:"Operational / logistics case.",gaps:"Robotics / AI data collection.",notes:"Relocating to San Jose post-graduation.",interviewDate:"",deadline:""},
+  {company:"Kx Advisors",role:"Consultant",location:"Boston, MA",status:"Applied",fit:"Good Fit",salary:"—",tech:"Yes",techNotes:"Case interview — pharma/medtech.",gaps:"Pharma / medical device knowledge.",notes:"Cover letter submitted. MBA qualifies at Consultant level.",interviewDate:"",deadline:""},
+  {company:"Tempus",role:"Commercial Strategy & Operations Associate",location:"Chicago, IL",status:"Applied",fit:"Strong Fit",salary:"—",tech:"Possibly",techNotes:"GTM or commercial ops case. Oncology.",gaps:"Oncology / life sciences. CRM tools.",notes:"Relocating to Chicago post-graduation. AI + healthcare.",interviewDate:"",deadline:""},
+  {company:"Worldpay",role:"Strategy Analyst – Platforms",location:"Denver, CO",status:"Applied",fit:"Good Fit",salary:"—",tech:"Possibly",techNotes:"Financial modelling case possible.",gaps:"Payments / fintech. Financial modelling.",notes:"Relocating to Denver post-graduation.",interviewDate:"",deadline:""},
+  {company:"OC&C Strategy Consultants",role:"Consultant",location:"Boston, MA",status:"Applied",fit:"Very Strong Fit",salary:"$165,000–$183,000 + bonus",tech:"Yes",techNotes:"2-3 rounds. Market sizing, M&A/PE cases.",gaps:"Case interview prep. Retail / consumer goods.",notes:"Highest salary in pipeline. Start case prep immediately.",interviewDate:"",deadline:""},
+  {company:"Innosight (WP&C)",role:"Senior Associate",location:"Major US airport (80% travel)",status:"Rejected",fit:"Partial Fit",salary:"—",tech:"Yes",techNotes:"Operational transformation cases.",gaps:"Operational transformation. Industrial sector.",notes:"Rejection received. 80% travel required.",interviewDate:"",deadline:""},
+  {company:"Wells Fargo",role:"Corporate Development Analyst",location:"Charlotte, NC",status:"Rejected",fit:"Partial Fit",salary:"—",tech:"Yes",techNotes:"DCF and LBO modelling.",gaps:"DCF. LBO analysis. Bank-specific metrics.",notes:"Rejected — no visa sponsorship.",interviewDate:"",deadline:""},
+  {company:"The Gunter Group",role:"Consultant – Business Analyst",location:"Denver, CO",status:"Applied",fit:"Good Fit",salary:"$100,000–$130,000",tech:"Possibly",techNotes:"Business process or systems analysis case.",gaps:"Agile/Waterfall. ERP/CRM depth.",notes:"SAP ERP exposure is genuine differentiator.",interviewDate:"",deadline:""},
+  {company:"Leerink Partners",role:"Associate, Business Management",location:"New York, NY",status:"Applied",fit:"Good Fit",salary:"$115,000–$135,000",tech:"Possibly",techNotes:"IB deal mechanics.",gaps:"Investment banking. IB-specific metrics.",notes:"Healthcare IB firm. Legal and M&A is genuine edge.",interviewDate:"",deadline:""},
+  {company:"Gibson Dunn",role:"Business Development Specialist",location:"New York, NY",status:"Rejected",fit:"Strong Fit",salary:"$110,000–$120,000",tech:"No",techNotes:"May include writing or pitch exercise.",gaps:"Law firm BD tools (InterAction CRM).",notes:"Rejection received. Legal background was strongest angle.",interviewDate:"",deadline:""},
+  {company:"Baker McKenzie",role:"Business Development Specialist, NA Client Programs",location:"New York, NY",status:"Applied",fit:"Strong Fit",salary:"—",tech:"No",techNotes:"Writing exercise or mock pitch.",gaps:"Law firm BD tools. Events management.",notes:"Global law firm. Legal background is key differentiator.",interviewDate:"",deadline:""},
+  {company:"Baker McKenzie",role:"New Business Intake Analyst",location:"TBC (Center Services)",status:"Applied",fit:"Very Strong Fit",salary:"—",tech:"No",techNotes:"Compliance or conflicts of interest scenario.",gaps:"PACER. AML/KYC. Matter management.",notes:"LLB and Morae/Samvad background maps perfectly.",interviewDate:"",deadline:""},
+  {company:"West Monroe",role:"Business Development Representative",location:"Chicago, IL",status:"Rejected",fit:"Good Fit",salary:"$85,000–$105,000",tech:"No",techNotes:"",gaps:"Consulting BD approach.",notes:"Rejection received Apr 3.",interviewDate:"",deadline:""},
+  {company:"EY-Parthenon",role:"Senior Consultant – Supply Chain",location:"Multiple",status:"Rejected",fit:"Partial Fit",salary:"$110,000–$130,000",tech:"Yes",techNotes:"Case interview.",gaps:"Supply chain domain gap.",notes:"Rejection received.",interviewDate:"",deadline:""},
+  {company:"EY-Parthenon",role:"Senior Consultant – Commercial Strategy",location:"Multiple",status:"Rejected",fit:"Strong Fit",salary:"$110,000–$130,000",tech:"Yes",techNotes:"Case interview.",gaps:"Case interview prep.",notes:"Rejection received Apr 3.",interviewDate:"",deadline:""},
+  {company:"DoorDash",role:"Strategy & Operations Manager",location:"San Francisco, CA",status:"Applied",fit:"Good Fit",salary:"$110,000–$130,000",tech:"No",techNotes:"",gaps:"Consumer tech / marketplace.",notes:"Applied Apr 2.",interviewDate:"",deadline:""},
+  {company:"PayPal",role:"Strategy Analyst",location:"San Jose, CA",status:"Applied",fit:"Good Fit",salary:"$100,000–$120,000",tech:"No",techNotes:"",gaps:"Payments / fintech.",notes:"Applied Apr 2.",interviewDate:"",deadline:""},
+  {company:"Nexthink",role:"Business Development Representative",location:"Boston, MA",status:"Applied",fit:"Good Fit",salary:"$80,000–$95,000",tech:"No",techNotes:"",gaps:"IT SaaS / DEX context.",notes:"Applied Apr 2.",interviewDate:"",deadline:""},
+  {company:"BRG (Berkeley Research Group)",role:"Marketing & BD Analyst, Corporate Finance",location:"Boston, MA",status:"Rejected",fit:"Good Fit",salary:"$100,000–$120,000",tech:"Possibly",techNotes:"Case-style.",gaps:"Expert witness / litigation support.",notes:"Rejection received Apr 2026.",interviewDate:"",deadline:""},
+  {company:"Liberty Mutual",role:"Strategy & Innovation Analyst",location:"—",status:"Applied",fit:"Partial Fit",salary:"$90,000–$110,000",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"Evolv Technology",role:"Business Development Manager",location:"—",status:"Applied",fit:"Partial Fit",salary:"$100,000–$120,000",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"Beyond Finance",role:"Strategy & Operations Associate",location:"—",status:"Applied",fit:"Good Fit",salary:"$90,000–$110,000",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"Mastercard",role:"Consultant – Advisors, Strategy & Transformation",location:"—",status:"Applied",fit:"Strong Fit",salary:"$97,000–$139,000",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"LPL Financial",role:"Sr. Analyst – Corporate Strategy",location:"—",status:"Applied",fit:"Good Fit",salary:"$100,900–$168,200",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"J.P. Morgan",role:"Embedded Finance Commercialization – GTM Strategy",location:"—",status:"Applied",fit:"Good Fit",salary:"Not listed",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"Vynamic",role:"Senior Associate – Life Sciences Consulting",location:"—",status:"Applied",fit:"Poor Fit",salary:"$85,000–$100,000",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"DoorDash",role:"Senior Associate – Strategy & Operations, Commerce Platform",location:"—",status:"Applied",fit:"Good Fit",salary:"$87,000–$128,000",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"Longaeva Partners",role:"AI/LLM Strategy Role",location:"—",status:"Declined",fit:"Poor Fit",salary:"—",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"Ramp",role:"FP&A Analyst",location:"—",status:"Declined",fit:"Poor Fit",salary:"—",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"Guidehouse",role:"Strategy Consultant",location:"—",status:"Declined",fit:"N/A",salary:"—",tech:"No",techNotes:"",gaps:"",notes:"Citizenship required.",interviewDate:"",deadline:""},
+  {company:"Saronic Technologies",role:"Strategy Role",location:"—",status:"Declined",fit:"N/A",salary:"—",tech:"No",techNotes:"",gaps:"",notes:"US Person required.",interviewDate:"",deadline:""},
+  {company:"West Monroe",role:"Market Research Associate",location:"—",status:"Declined",fit:"Poor Fit",salary:"—",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"FTI Consulting",role:"Strategy & Transformation Analyst",location:"—",status:"Declined",fit:"Strong Fit",salary:"—",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"McKinsey",role:"Associate – McKinsey Transformation",location:"—",status:"Rejected",fit:"Strong Fit",salary:"—",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"DLA Piper",role:"Strategy Analyst",location:"—",status:"Rejected",fit:"Good Fit",salary:"—",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"Oscar Health",role:"Associate – Provider Experience Strategy",location:"—",status:"Applied",fit:"Partial Fit",salary:"$88,560–$116,235",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"UCB",role:"Business Planning & Operations Associate – U.S. Corporate Affairs",location:"—",status:"Rejected",fit:"Good Fit",salary:"$108,000–$141,800",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"Fifth Third Bank",role:"Associate – Corporate Strategy",location:"—",status:"Applied",fit:"Good Fit",salary:"$82,100–$172,500",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"Consilio",role:"Strategy & Transformation Analyst (Rotational Program)",location:"—",status:"Applied",fit:"Strong Fit",salary:"Not listed",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"Huntington Bank",role:"Commercial Strategy Senior Consultant",location:"—",status:"Applied",fit:"Good Fit",salary:"$77,000–$154,000",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"Molex (Koch Industries)",role:"Corporate Development Associate",location:"—",status:"Applied",fit:"Partial Fit",salary:"$110,000–$120,000",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"Coral Care",role:"Strategy & Operations Associate",location:"—",status:"Applied",fit:"Good Fit",salary:"$90,000–$120,000",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"Handshake",role:"Strategic Projects Associate",location:"—",status:"Applied",fit:"Partial Fit",salary:"$100,000–$115,000",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"Google / YouTube",role:"Strategy Associate – Strategy, Analytics & Finance",location:"—",status:"Applied",fit:"Strong Fit",salary:"$118,000–$170,000 + bonus + equity",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"Visa",role:"GTM Analyst – Visa Direct, North America Commercialization",location:"—",status:"Applied",fit:"Good Fit",salary:"$123,000–$190,900 + bonus + equity",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"EliseAI",role:"GTM Strategy & Operations Senior Associate",location:"—",status:"Applied",fit:"Strong Fit",salary:"$120,000–$170,000 + equity",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"ITW (Illinois Tool Works)",role:"Strategic Market Research Analyst",location:"—",status:"Applied",fit:"Good Fit",salary:"$105,000–$120,000",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"New Balance",role:"Senior Strategy Analyst – APAC & Japan",location:"—",status:"Applied",fit:"Good Fit",salary:"$100,200–$158,400",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"Goldman Sachs Ayco",role:"Business Development Associate",location:"—",status:"Applied",fit:"Good Fit",salary:"$90,000–$120,000 + bonus",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"Grant Thornton Stax",role:"Senior Consultant",location:"—",status:"Applied",fit:"Strong Fit",salary:"$165,000–$190,000 + bonus",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"ZS Associates",role:"Advisory Associate Consultant – Business Advisory",location:"—",status:"Rejected",fit:"Partial Fit",salary:"Not listed",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"MongoDB",role:"Business Operations & Strategy Associate",location:"—",status:"Applied",fit:"Good Fit",salary:"$97,000–$189,000",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"Keystone Strategy",role:"Associate / Consultant (Strategist)",location:"—",status:"Applied",fit:"Good Fit",salary:"$110,000–$176,000",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"CarGurus",role:"Principal Strategy Analyst",location:"—",status:"Applied",fit:"Good Fit",salary:"$124,000–$155,000 + RSUs",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"McChrystal Group",role:"Associate – Implementation Practice",location:"—",status:"Applied",fit:"Partial Fit",salary:"Not listed",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"KKR",role:"Business Analyst – Global Marketing",location:"—",status:"Applied",fit:"Good Fit",salary:"$100,000–$125,000 + bonus",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"Optimizely",role:"GTM AI Strategist",location:"—",status:"Applied",fit:"Partial Fit",salary:"Not listed",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"DoorDash",role:"Merchant Strategy & Operations Senior Associate",location:"—",status:"Applied",fit:"Good Fit",salary:"$87,000–$128,000 + equity",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"Oliver Wyman",role:"Consultant / Senior Consultant – Private Equity Practice",location:"—",status:"Applied",fit:"Strong Fit",salary:"$135,000–$195,000",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"Analog Devices (ADI)",role:"Corporate Development Analyst / Senior Analyst",location:"—",status:"Applied",fit:"Good Fit",salary:"$95,600–$131,450",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+  {company:"Hasbro",role:"Corporate Development / M&A Associate",location:"—",status:"Applied",fit:"Good Fit",salary:"$127,300–$190,900",tech:"No",techNotes:"",gaps:"",notes:"",interviewDate:"",deadline:""},
+];
+
+let apps = RAW.map((a,i)=>({...a,_i:i,_hidden:false,updatedAt:null}));
+let currentF='all', sortCol='_i', sortDir=1, pending=null;
+
+// ── UTILS ──
+const normSt = s => {
+  s=(s||'').toLowerCase();
+  if(s.includes('declined')||s.includes('pursuing'))return'declined';
+  if(s.includes('rejected'))return'rejected';
+  if(s.includes('interviewing'))return'interviewing';
+  if(s.includes('offer'))return'offer';
+  return'applied';
+};
+const fitCls = f => {f=(f||'').toLowerCase();if(f.includes('very strong'))return'fit-vs';if(f.includes('strong'))return'fit-s';if(f.includes('good'))return'fit-g';if(f.includes('partial'))return'fit-p';if(f.includes('poor'))return'fit-po';return'fit-na';};
+const techCls = t => {t=(t||'').toLowerCase();if(t==='yes')return'tech-yes';if(t==='possibly')return'tech-maybe';return'tech-no';};
+const today = () => new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'});
+const isUrgent = d => {if(!d)return false;const diff=(new Date(d)-new Date())/(1000*60*60*24);return diff>=0&&diff<=5;};
+
+function toast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast'+(type?' '+type:'');t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+// ── STATS ──
+function updateStats(){
+  const vis=apps.filter(a=>!a._hidden);
+  const applied=vis.filter(a=>normSt(a.status)==='applied').length;
+  const rej=vis.filter(a=>normSt(a.status)==='rejected').length;
+  const dec=vis.filter(a=>normSt(a.status)==='declined').length;
+  const inter=vis.filter(a=>normSt(a.status)==='interviewing').length;
+  const offer=vis.filter(a=>normSt(a.status)==='offer').length;
+  const strong=vis.filter(a=>(a.fit||'').toLowerCase().includes('strong')).length;
+  const pipeline=applied+inter+offer;
+  const total=vis.length;
+  const rate=total?(Math.round((rej+inter+offer)/total*100))+'%':'—';
+
+  document.getElementById('h-total').textContent=total;
+  document.getElementById('h-active').textContent=pipeline;
+  document.getElementById('h-rate').textContent=rate;
+  document.getElementById('s-total').textContent=total;
+  document.getElementById('s-applied').textContent=applied;
+  document.getElementById('s-inter').textContent=inter;
+  document.getElementById('s-offer').textContent=offer;
+  document.getElementById('s-rej').textContent=rej;
+  document.getElementById('s-dec').textContent=dec;
+  document.getElementById('s-strong').textContent=strong;
+  document.getElementById('footer-txt').textContent=`Showing ${total} of ${apps.length} applications`;
+
+  // Pipeline bar
+  const pb=document.getElementById('pipe-bar');
+  const tot2=applied+inter+offer+rej+dec||1;
+  pb.innerHTML=[
+    {v:applied,c:'var(--teal)'},{v:inter,c:'var(--lime)'},{v:offer,c:'var(--violet)'},
+    {v:rej,c:'var(--red)'},{v:dec,c:'var(--muted)'}
+  ].map(({v,c})=>`<div class="pipe-seg" style="flex:${Math.max(v,0.2)};background:${c}"></div>`).join('');
+}
+
+// ── FILTERS ──
+function applyFilters(){
+  const q=document.getElementById('search').value.toLowerCase();
+  apps.forEach(a=>{
+    const mF=currentF==='all'||normSt(a.status)===currentF;
+    const mQ=!q||[a.company,a.role,a.location,a.notes,a.gaps,a.salary].join(' ').toLowerCase().includes(q);
+    a._hidden=!(mF&&mQ);
+  });
+  renderTable();updateStats();
+}
+function setF(f,btn){
+  currentF=f;
+  document.querySelectorAll('.filt').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('.det-row').forEach(r=>r.classList.remove('open'));
+  document.querySelectorAll('.app-row').forEach(r=>r.classList.remove('expanded'));
+  applyFilters();
+}
+function sortBy(col){
+  if(sortCol===col)sortDir*=-1;else{sortCol=col;sortDir=1;}
+  apps.sort((a,b)=>{const av=col==='_i'?a._i:(a[col]||'').toLowerCase();const bv=col==='_i'?b._i:(b[col]||'').toLowerCase();return av<bv?-sortDir:av>bv?sortDir:0;});
+  renderTable();
+}
+
+// ── TABLE ──
+function toggleRow(i){
+  const row=document.getElementById('ar-'+i),det=document.getElementById('dr-'+i);
+  const was=det.classList.contains('open');
+  document.querySelectorAll('.det-row').forEach(r=>r.classList.remove('open'));
+  document.querySelectorAll('.app-row').forEach(r=>r.classList.remove('expanded'));
+  if(!was){det.classList.add('open');row.classList.add('expanded');}
+}
+function chSt(i,v,e){
+  if(e)e.stopPropagation();
+  apps[i].status=v;apps[i].updatedAt=today();
+  document.querySelectorAll(`.ssel[data-i="${i}"]`).forEach(s=>s.className='ssel '+normSt(v));
+  const u=document.getElementById('upd-'+i);if(u)u.textContent=today();
+  updateStats();toast('Status updated to '+v,'ok');
+}
+function saveEdits(i,e){
+  if(e)e.stopPropagation();
+  const a=apps[i];
+  ['notes','gaps'].forEach(k=>{const el=document.getElementById(`ed-${k}-${i}`);if(el)a[k]=el.value;});
+  const t=document.getElementById(`ed-tech-${i}`);if(t)a.tech=t.value;
+  const d=document.getElementById(`ed-idate-${i}`);if(d)a.interviewDate=d.value;
+  const dl=document.getElementById(`ed-dl-${i}`);if(dl)a.deadline=dl.value;
+  a.updatedAt=today();
+  const u=document.getElementById('upd-'+i);if(u)u.textContent=today();
+  toast('Saved','ok');
+}
+
+function renderTable(){
+  const tbody=document.getElementById('tbody');
+  const anyVis=apps.some(a=>!a._hidden);
+  document.getElementById('empty').style.display=anyVis?'none':'block';
+  tbody.innerHTML=apps.map(a=>{
+    const st=normSt(a.status);
+    const urg=isUrgent(a.deadline);
+    return`<tr class="app-row${a._hidden?' hidden':''}${urg?' urgency-row':''}" id="ar-${a._i}" onclick="toggleRow(${a._i})">
+      <td class="td-num">${a._i+1}</td>
+      <td class="td-co">${a.company}<span class="chev">›</span>${urg?`<span class="urgency-badge">URGENT</span>`:''}</td>
+      <td class="td-role"><span title="${a.role}">${a.role}</span></td>
+      <td class="td-loc"><span title="${a.location}">${a.location}</span></td>
+      <td onclick="event.stopPropagation()">
+        <select class="ssel ${st}" data-i="${a._i}" onchange="chSt(${a._i},this.value,event)">
+          <option value="Applied" ${a.status==='Applied'?'selected':''}>Applied</option>
+          <option value="Interviewing" ${a.status==='Interviewing'?'selected':''}>Interviewing</option>
+          <option value="Offer" ${a.status==='Offer'?'selected':''}>Offer</option>
+          <option value="Rejected" ${a.status.includes('Rejected')?'selected':''}>Rejected</option>
+          <option value="Declined" ${a.status.includes('Declined')||a.status.includes('Pursuing')?'selected':''}>Declined</option>
+        </select>
+      </td>
+      <td><span class="fit ${fitCls(a.fit)}">${a.fit||'—'}</span></td>
+      <td class="td-sal"><span title="${a.salary}">${a.salary}</span></td>
+      <td><span class="tech ${techCls(a.tech)}">${a.tech}</span></td>
+      <td class="td-date" id="upd-${a._i}">${a.updatedAt||'—'}</td>
+    </tr>
+    <tr class="det-row" id="dr-${a._i}"><td colspan="9">
+      <div class="det-inner">
+        <div class="det-sec"><div class="det-lbl">Notes / Next Steps</div><textarea class="det-edit" id="ed-notes-${a._i}" onclick="event.stopPropagation()">${a.notes||''}</textarea></div>
+        <div class="det-sec"><div class="det-lbl">Key Gaps to Prepare</div><textarea class="det-edit" id="ed-gaps-${a._i}" onclick="event.stopPropagation()">${a.gaps||''}</textarea></div>
+        ${a.techNotes?`<div class="det-sec"><div class="det-lbl">Interview Prep Notes</div><div class="det-val">${a.techNotes}</div></div>`:''}
+        <div class="det-sec">
+          <div class="det-lbl">Tech Screen</div>
+          <select class="det-edit" id="ed-tech-${a._i}" onclick="event.stopPropagation()"><option value="No" ${a.tech==='No'?'selected':''}>No</option><option value="Possibly" ${a.tech==='Possibly'?'selected':''}>Possibly</option><option value="Yes" ${a.tech==='Yes'?'selected':''}>Yes</option></select>
+        </div>
+        <div class="det-sec">
+          <div class="det-lbl">Interview Date</div>
+          <input type="date" class="det-edit" id="ed-idate-${a._i}" value="${a.interviewDate||''}" onclick="event.stopPropagation()"/>
+        </div>
+        <div class="det-sec">
+          <div class="det-lbl">Application Deadline</div>
+          <input type="date" class="det-edit" id="ed-dl-${a._i}" value="${a.deadline||''}" onclick="event.stopPropagation()"/>
+        </div>
+        ${a.salary&&a.salary!=='—'?`<div class="det-sec"><div class="det-lbl">Salary Range</div><div class="det-val">${a.salary}</div></div>`:''}
+      </div>
+      <div class="det-actions">
+        <button class="btn sm primary" onclick="saveEdits(${a._i},event)">Save changes</button>
+        <button class="btn sm" onclick="prefill(${a._i});showPage('apply',null)">Generate materials →</button>
+        <div class="det-ts">${a.updatedAt?'Updated '+a.updatedAt:''}</div>
+      </div>
+    </td></tr>`;
+  }).join('');
+}
+
+// ── MODAL ──
+function openAdd(){document.getElementById('add-modal').classList.add('open');}
+function closeModal(){document.getElementById('add-modal').classList.remove('open');}
+function addApp(){
+  const co=document.getElementById('m-co').value.trim();
+  const role=document.getElementById('m-role').value.trim();
+  if(!co||!role){toast('Company and role required');return;}
+  apps.push({company:co,role,location:document.getElementById('m-loc').value||'—',status:document.getElementById('m-st').value,fit:document.getElementById('m-fit').value,salary:document.getElementById('m-sal').value||'—',tech:document.getElementById('m-tech').value,techNotes:'',gaps:document.getElementById('m-gaps').value||'',notes:document.getElementById('m-notes').value||'',interviewDate:document.getElementById('m-idate').value||'',deadline:document.getElementById('m-deadline').value||'',_i:apps.length,_hidden:false,updatedAt:today()});
+  closeModal();
+  ['m-co','m-role','m-loc','m-sal','m-notes','m-gaps','m-idate','m-deadline'].forEach(id=>document.getElementById(id).value='');
+  applyFilters();toast('Application added','ok');
+}
+
+// ── PAGES ──
+function showPage(pg,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+pg).classList.add('active');
+  if(btn)btn.classList.add('active');
+  else document.querySelectorAll('.nav-tab').forEach(b=>{if(b.textContent.toLowerCase().includes(pg))b.classList.add('active');});
+  if(pg==='apply')checkWorker();
+}
+function prefill(i){
+  const a=apps[i];
+  document.getElementById('a-co').value=a.company;
+  document.getElementById('a-role').value=a.role;
+  document.getElementById('a-loc').value=a.location;
+  document.getElementById('a-sal').value=a.salary;
+}
+
+// ── WORKER CONFIG ──
+function getWorkerUrl(){return localStorage.getItem('worker_url')||'';}
+function toggleWcfg(){
+  const p=document.getElementById('wcfg-panel');
+  const isOpen=p.classList.contains('open');
+  p.classList.toggle('open');
+  if(!isOpen){
+    const saved=getWorkerUrl();
+    if(saved)document.getElementById('wcfg-inp').value=saved;
+    document.getElementById('wcfg-inp').focus();
+  }
+}
+function saveWorker(){
+  const val=document.getElementById('wcfg-inp').value.trim();
+  if(!val)return;
+  localStorage.setItem('worker_url',val);
+  document.getElementById('wdot').classList.add('ok');
+  document.getElementById('wcfg-ok').style.display='block';
+  setTimeout(()=>{document.getElementById('wcfg-ok').style.display='none';document.getElementById('wcfg-panel').classList.remove('open');},1500);
+  checkWorker();
+  toast('Worker URL saved','ok');
+}
+function checkWorker(){
+  const url=getWorkerUrl();
+  document.getElementById('wdot').classList.toggle('ok',!!url);
+  const warn=document.getElementById('worker-warn');
+  if(warn)warn.classList.toggle('show',!url);
+}
+document.addEventListener('click',e=>{
+  const p=document.getElementById('wcfg-panel');
+  const btn=document.querySelector('.worker-cfg');
+  if(p&&btn&&!p.contains(e.target)&&!btn.contains(e.target))p.classList.remove('open');
+});
+
+// ── TAB SWITCH ──
+function switchTab(tab,btn){
+  document.querySelectorAll('.out-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.out-pane').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('pane-'+tab).classList.add('active');
+}
+
+// ── GENERATE ──
+async function generate(){
+  const jd=document.getElementById('a-jd').value.trim();
+  const co=document.getElementById('a-co').value.trim();
+  const role=document.getElementById('a-role').value.trim();
+  const err=document.getElementById('gen-err');
+  err.textContent='';
+
+  if(!jd){err.textContent='Please paste the job description.';return;}
+  if(!co||!role){err.textContent='Please fill in company and role.';return;}
+  const workerUrl=getWorkerUrl();
+  if(!workerUrl){err.textContent='No Worker URL configured. Click "AI Config" in the nav.';return;}
+
+  document.getElementById('gen-btn').disabled=true;
+  document.getElementById('spin').style.display='block';
+  document.getElementById('gen-status').textContent='Analysing job description…';
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('dl-section').classList.remove('show');
+  document.getElementById('save-bar').classList.remove('show');
+
+  const prompt = `You are a career coach helping an MBA candidate with their job applications. Analyse this job and candidate match deeply and honestly.
+
+CANDIDATE PROFILE:
+${PROFILE}
+
+TARGET ROLE: ${role} at ${co}
+JOB DESCRIPTION:
+${jd}
+
+Respond ONLY in valid JSON. No markdown fences, no preamble. Exact structure:
+{
+  "matchScore": 74,
+  "verdict": "Strong strategic match with one key gap",
+  "summary": "2-3 honest sentences on overall fit — what makes this compelling and what to watch for",
+  "pros": ["pro1", "pro2", "pro3"],
+  "cons": ["con1", "con2"],
+  "gaps": "Specific honest gap assessment — what skills or experience are missing and how to address them in the application",
+  "resumeBullets": "5 tailored SAP Sales Development bullets that connect directly to this JD's language. Start each with an action verb. Each on a new line starting with •. Include metrics.",
+  "coverLetter": "3 paragraphs. Genuine, no em dashes, no clichés. Open with the most relevant and specific connection to the role. Dear Hiring Manager,\\n\\n[para 1]\\n\\n[para 2]\\n\\n[para 3]\\n\\nSincerely,\\nAbhigyan Singhal",
+  "outreachEmail": "Subject: [subject line]\\n\\nHi [First Name],\\n\\n[2 short sharp paragraphs. Genuine, no em dashes.]\\n\\nBest,\\nAbhigyan",
+  "interviewPrep": [
+    {"type": "behavioral", "question": "Tell me about a time you...", "hint": "Draw from Samvad deal work or SAP account management. Emphasise X."},
+    {"type": "technical", "question": "Walk me through how you'd approach...", "hint": "Framework to use and what to emphasise."},
+    {"type": "situational", "question": "How would you handle...", "hint": "What they're really testing and how to structure your answer."},
+    {"type": "behavioral", "question": "...", "hint": "..."},
+    {"type": "situational", "question": "...", "hint": "..."}
+  ],
+  "keywords": ["keyword1","keyword2","keyword3","keyword4","keyword5","keyword6","keyword7","keyword8","keyword9","keyword10"]
+}`;
+
+  try {
+    document.getElementById('gen-status').textContent='Generating materials…';
+    const res = await fetch(workerUrl, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({messages:[{role:'user',content:prompt}]})
+    });
+    if(!res.ok) throw new Error('Worker returned '+res.status);
+    const data = await res.json();
+    if(data.error) throw new Error(data.error.message||JSON.stringify(data.error));
+    const txt = data.content.map(i=>i.text||'').join('').replace(/```json|```/g,'').trim();
+    const p = JSON.parse(txt);
+
+    // Render fit card
+    const score = Math.min(100,Math.max(0,Math.round(p.matchScore||0)));
+    document.getElementById('fit-num').textContent=score;
+    const circle=document.getElementById('fit-circle');
+    const col=score>=70?'var(--lime)':score>=50?'var(--amber)':'var(--coral)';
+    circle.style.borderColor=col;
+    document.getElementById('fit-num').style.color=col;
+    document.getElementById('fit-verdict').textContent=p.verdict||'';
+    document.getElementById('fit-summary').textContent=p.summary||'';
+    document.getElementById('fit-pros').innerHTML=(p.pros||[]).map(x=>`<div class="fit-point pro">${x}</div>`).join('');
+    document.getElementById('fit-cons').innerHTML=(p.cons||[]).map(x=>`<div class="fit-point con">${x}</div>`).join('');
+    document.getElementById('fit-gaps').textContent=p.gaps||'';
+
+    // Render outputs
+    document.getElementById('box-resume').textContent=p.resumeBullets||'';
+    document.getElementById('box-cover').textContent=p.coverLetter||'';
+    document.getElementById('box-email').textContent=p.outreachEmail||'';
+    document.getElementById('box-kw').innerHTML=(p.keywords||[]).map(k=>`<span class="kw">${k}</span>`).join('');
+
+    // Interview prep
+    const prepEl=document.getElementById('box-prep');
+    prepEl.innerHTML=(p.interviewPrep||[]).map(q=>`
+      <div class="prep-item">
+        <div class="prep-type ${q.type}">${q.type}</div>
+        <div class="prep-q">${q.question}</div>
+        <div class="prep-hint">${q.hint}</div>
+      </div>`).join('');
+
+    // Show results
+    document.getElementById('results').style.display='block';
+    document.getElementById('results').classList.add('show');
+    document.getElementById('dl-section').classList.add('show');
+    document.getElementById('save-bar').classList.add('show');
+
+    pending={company:co,role,location:document.getElementById('a-loc').value,salary:document.getElementById('a-sal').value};
+    document.getElementById('gen-status').textContent='';
+    toast('Generated successfully','ok');
+  } catch(e) {
+    err.textContent='Generation failed: '+e.message+'. Check your Worker URL in AI Config.';
+    console.error(e);
+  }
+  document.getElementById('gen-btn').disabled=false;
+  document.getElementById('spin').style.display='none';
+  document.getElementById('gen-status').textContent='';
+}
+
+function copyBox(id,btn){
+  navigator.clipboard.writeText(document.getElementById(id).textContent).then(()=>{
+    const o=btn.textContent;btn.textContent='Copied!';setTimeout(()=>btn.textContent=o,1800);
+  });
+}
+
+function saveToTracker(){
+  if(!pending)return;
+  apps.push({...pending,status:document.getElementById('sv-status').value,notes:document.getElementById('sv-notes').value,fit:'—',tech:'No',techNotes:'',gaps:'',interviewDate:'',deadline:'',_i:apps.length,_hidden:false,updatedAt:today()});
+  applyFilters();
+  const ok=document.getElementById('save-ok');ok.style.display='block';setTimeout(()=>ok.style.display='none',3000);
+  document.getElementById('sv-notes').value='';pending=null;toast('Saved to tracker','ok');
+}
+
+// ── WORD DOCUMENT GENERATION ──
+function loadDocx(){
+  return new Promise((res,rej)=>{
+    if(window.docx){res(window.docx);return;}
+    const s=document.createElement('script');
+    s.src='https://unpkg.com/docx@8.5.0/build/index.umd.js';
+    s.onload=()=>res(window.docx);s.onerror=rej;
+    document.head.appendChild(s);
+  });
+}
+
+async function dlResume(){
+  const btn=document.getElementById('dl-res');
+  const orig=btn.textContent;btn.textContent='Building…';btn.disabled=true;
+  try{
+    const {Document,Packer,Paragraph,TextRun,AlignmentType,LevelFormat,BorderStyle,TabStopType}=await loadDocx();
+    const co=(document.getElementById('a-co').value.trim()||'Application').replace(/[^\w\s]/g,'').trim();
+    const rawB=document.getElementById('box-resume').textContent||'';
+    const sapBuls=rawB.split('\n').map(b=>b.replace(/^[•\-\*]\s*/,'').trim()).filter(b=>b.length>15);
+
+    const sp=pt=>pt*20,dxa=i=>Math.round(i*1440),F='Calibri',GR='595959';
+    const rule=()=>new Paragraph({spacing:{before:60,after:60},border:{bottom:{style:BorderStyle.SINGLE,size:6,color:'2E2E2E',space:1}},children:[]});
+    const secH=t=>new Paragraph({spacing:{before:160,after:60},border:{bottom:{style:BorderStyle.SINGLE,size:3,color:'999999',space:1}},children:[new TextRun({text:t,font:F,size:sp(10),bold:true,allCaps:true})]});
+    const jR=(co2,loc)=>new Paragraph({spacing:{before:100,after:20},tabStops:[{type:TabStopType.RIGHT,position:dxa(7.4)}],children:[new TextRun({text:co2,font:F,size:sp(10.5),bold:true}),new TextRun({text:'\t'}),new TextRun({text:loc,font:F,size:sp(10),color:GR})]});
+    const rR=(r,d)=>new Paragraph({spacing:{after:18},tabStops:[{type:TabStopType.RIGHT,position:dxa(7.4)}],children:[new TextRun({text:r,font:F,size:sp(10),italics:true}),new TextRun({text:'\t'}),new TextRun({text:d,font:F,size:sp(10),italics:true,color:GR})]});
+    const dsc=t=>new Paragraph({spacing:{after:28},children:[new TextRun({text:t,font:F,size:sp(9.5),italics:true,color:GR})]});
+    const bul=t=>new Paragraph({spacing:{after:40},numbering:{reference:'b',level:0},children:[new TextRun({text:t,font:F,size:sp(10)})]});
+    const sub=t=>new Paragraph({spacing:{after:28},indent:{left:dxa(0.15)},children:[new TextRun({text:t,font:F,size:sp(9.5),italics:true,color:GR})]});
+    const gap=()=>new Paragraph({spacing:{after:14},children:[]});
+    const defB=['Build structured account assessments across a portfolio of 50+ enterprise accounts \u2014 researching company profiles, identifying strategic priorities, and developing targeted recommendations that inform senior account executive strategy.','Built AI-powered research and outreach workflows using ZoomInfo intent signals, cutting prep time 30% and improving engagement response rates 25% \u2014 adopted across the broader sales team.'];
+
+    const doc=new Document({
+      numbering:{config:[{reference:'b',levels:[{level:0,format:LevelFormat.BULLET,text:'\u2022',alignment:AlignmentType.LEFT,style:{paragraph:{indent:{left:360,hanging:260}}}}]}]},
+      sections:[{properties:{page:{size:{width:12240,height:15840},margin:{top:720,right:1080,bottom:720,left:1080}}},children:[
+        new Paragraph({alignment:AlignmentType.CENTER,spacing:{after:40},children:[new TextRun({text:'Abhigyan Singhal',font:F,size:sp(14),bold:true})]}),
+        new Paragraph({alignment:AlignmentType.CENTER,spacing:{after:60},children:[new TextRun({text:'Boston, MA  \u00B7  (857) 832-1620  \u00B7  abhigyan.singhal@gmail.com  \u00B7  linkedin.com/in/abhigyansinghal  \u00B7  3-Year OPT Eligible from June 2026',font:F,size:sp(9.5),color:GR})]}),
+        rule(),
+        new Paragraph({spacing:{after:120},children:[new TextRun({text:'Two years of M&A and PE/VC transaction advisory at Samvad Partners, combined with two years managing legal due diligence workstreams for US and UK private equity clients at Morae Global. I have supported deals end to end \u2014 from initial opportunity assessment and diligence coordination through to closing \u2014 and have built the financial analyses, internal recommendations, and cross-functional stakeholder management that corporate development work demands. Based in Boston, available from June 2026 on 3-year OPT.',font:F,size:sp(10)})]}),
+        secH('EDUCATION'),
+        jR('Babson College \u2014 F.W. Olin Graduate School of Business','Aug 2024 \u2013 May 2026'),
+        rR('MBA \u00B7 Concentration: Business Analytics & Machine Learning (STEM-designated) \u00B7 GPA: 3.6','Needham, MA'),
+        sub('Courses: Financial Valuation \u00B7 Business Strategy \u00B7 Data Analytics \u00B7 Operations Management \u00B7 Eligible for 3-year OPT from June 2026 \u00B7 COO, Food & Agriculture Club'),
+        gap(),
+        jR('Christ University, Bengaluru','Jun 2014 \u2013 May 2019'),
+        rR('Bachelor of Law (LLB)','Bengaluru, India'),
+        sub('Corporate Law \u00B7 M&A \u00B7 Private Equity & Venture Capital Transactions \u00B7 Securities Law \u00B7 Contract Law'),
+        secH('EXPERIENCE'),
+        jR('SAP','Boston, MA'),rR('Sales Development Intern','Aug 2025 \u2013 Present'),
+        dsc('Global enterprise software leader \u2014 400,000+ customers across 180 countries.'),
+        ...(sapBuls.length>=2?sapBuls.map(b=>bul(b)):defB.map(b=>bul(b))),
+        gap(),jR('AI Fund \u2014 Babson Consulting Project','Boston, MA'),rR('Strategy Consultant','Jan 2025 \u2013 May 2025'),
+        dsc('Babson-affiliated venture studio backing early-stage AI companies.'),
+        bul('Led commercial due diligence for two early-stage AI ventures \u2014 assessing market size, competitive dynamics, and customer acquisition economics, and presenting investment theses to fund partners.'),
+        gap(),jR('Cafe Totaram Pvt Ltd','India'),rR('Chief Executive Officer','May 2023 \u2013 Aug 2024'),
+        dsc('F&B consumer business with 5,000+ monthly customers; full P&L responsibility.'),
+        bul('Built and managed full P&L including financial forecasts, procurement models, and margin analyses \u2014 delivering 20% YoY revenue growth, 15% profit margin improvement, and 12% reduction in procurement costs across a 20-person operation.'),
+        bul('Developed inventory and vendor performance models that reduced waste 20% and improved stock turnover 30% \u2014 all analytical work done independently without external advisory support.'),
+        gap(),jR('Samvad Partners','Bengaluru, India'),rR('Consultant','Apr 2021 \u2013 Apr 2023'),
+        dsc('Leading Indian corporate law firm specialising in M&A, PE/VC, and cross-border transactions.'),
+        bul('Supported 13+ M&A and PE/VC transactions ($5M+ combined deal value) end to end \u2014 conducting commercial and legal due diligence, building investment analyses, evaluating target business quality, and preparing internal recommendations for PE clients making capital allocation decisions.'),
+        bul('Structured convertible note agreements ($1M+), assessed regulatory and liability exposure reducing client risk by 15%, and managed relationships with investment banks throughout deal processes \u2014 accelerating transaction turnaround by 30%.'),
+        gap(),jR('Morae Global','Bengaluru, India'),rR('Legal & Project Management Associate','Jun 2019 \u2013 Jan 2021'),
+        dsc('Global legal services firm managing PE/VC due diligence for US and UK private equity clients.'),
+        bul('Managed legal due diligence workstreams for US and UK PE clients \u2014 reviewing 200+ contracts per engagement and synthesising findings into structured reports for deal teams. Promoted from contract analysis into project management, owning workstream delivery and coordinating multi-jurisdictional teams under deal timelines.'),
+        secH('SKILLS & TOOLS'),
+        new Paragraph({spacing:{after:36},children:[new TextRun({text:'Intermediate:  ',font:F,size:sp(10),bold:true}),new TextRun({text:'Excel \u00B7 PowerPoint \u00B7 AI workflow automation \u00B7 ZoomInfo',font:F,size:sp(10)})]}),
+        new Paragraph({spacing:{after:36},children:[new TextRun({text:'Basic:  ',font:F,size:sp(10),bold:true}),new TextRun({text:'SQL \u00B7 Python \u00B7 Power BI',font:F,size:sp(10)})]}),
+        new Paragraph({spacing:{after:36},children:[new TextRun({text:'Functional:  ',font:F,size:sp(10),bold:true}),new TextRun({text:'M&A due diligence \u00B7 transaction advisory \u00B7 deal structuring \u00B7 investment analysis \u00B7 financial forecasting \u00B7 cross-functional stakeholder coordination \u00B7 executive communications',font:F,size:sp(10)})]}),
+        new Paragraph({spacing:{after:36},children:[new TextRun({text:'Communication:  ',font:F,size:sp(10),bold:true}),new TextRun({text:'Executive presentations \u00B7 client-facing delivery \u00B7 English (fluent) \u00B7 Hindi (native)',font:F,size:sp(10)})]}),
+        secH('ACTIVITIES'),
+        new Paragraph({spacing:{after:40},children:[new TextRun({text:'Philip C. Jessup Moot Court  \u00B7  COO, Babson Food & Agriculture Club  \u00B7  University Soccer Team Captain  \u00B7  Young Indians (Yi) Entrepreneurial Network',font:F,size:sp(10)})]})
+      ]}]
+    });
+    const blob=await Packer.toBlob(doc);
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download='Resume_Abhigyan_'+co.replace(/\s+/g,'_')+'.docx';a.click();URL.revokeObjectURL(url);
+    btn.textContent='\u2713 Downloaded!';setTimeout(()=>{btn.textContent=orig;btn.disabled=false;},2000);
+    toast('Resume downloaded','ok');
+  }catch(e){console.error(e);btn.textContent='Error';setTimeout(()=>{btn.textContent=orig;btn.disabled=false;},2000);}
+}
+
+async function dlCover(){
+  const btn=document.getElementById('dl-cl');
+  const orig=btn.textContent;btn.textContent='Building…';btn.disabled=true;
+  try{
+    const {Document,Packer,Paragraph,TextRun,AlignmentType,BorderStyle}=await loadDocx();
+    const co=(document.getElementById('a-co').value.trim()||'Application').replace(/[^\w\s]/g,'').trim();
+    const rawCL=document.getElementById('box-cover').textContent.trim();
+    const sp=pt=>pt*20,F='Calibri',GR='595959';
+    let paras=rawCL.split('\n').map(p=>p.trim()).filter(Boolean);
+    paras=paras.filter(p=>!p.match(/^Dear Hiring/i)&&!p.match(/^Best,?$/i)&&!p.match(/^Abhigyan/i)&&!p.match(/^Sincerely,?$/i)&&!p.match(/^Thank you/i));
+    const mkP=(text,opts={})=>new Paragraph({spacing:{after:opts.after||200},children:[new TextRun({text,font:F,size:sp(10.5),color:'000000',bold:opts.bold||false})]});
+    const doc=new Document({sections:[{properties:{page:{size:{width:12240,height:15840},margin:{top:1080,right:1296,bottom:1080,left:1296}}},children:[
+      new Paragraph({alignment:AlignmentType.CENTER,spacing:{after:40},children:[new TextRun({text:'Abhigyan Singhal',font:F,size:sp(14),bold:true})]}),
+      new Paragraph({alignment:AlignmentType.CENTER,spacing:{after:80},children:[new TextRun({text:'Boston, MA  \u00B7  (857) 832-1620  \u00B7  abhigyan.singhal@gmail.com  \u00B7  linkedin.com/in/abhigyansinghal',font:F,size:sp(9.5),color:GR})]}),
+      new Paragraph({spacing:{before:60,after:220},border:{bottom:{style:BorderStyle.SINGLE,size:6,color:'2E2E2E',space:1}},children:[]}),
+      mkP(new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}),{after:240}),
+      mkP('Dear Hiring Manager,',{after:200}),
+      ...paras.map(p=>mkP(p,{after:200})),
+      mkP('Sincerely,',{after:280}),
+      mkP('Abhigyan Singhal',{bold:true,after:0})
+    ]}]});
+    const blob=await Packer.toBlob(doc);
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download='CoverLetter_Abhigyan_'+co.replace(/\s+/g,'_')+'.docx';a.click();URL.revokeObjectURL(url);
+    btn.textContent='\u2713 Downloaded!';setTimeout(()=>{btn.textContent=orig;btn.disabled=false;},2000);
+    toast('Cover letter downloaded','ok');
+  }catch(e){console.error(e);btn.textContent='Error';setTimeout(()=>{btn.textContent=orig;btn.disabled=false;},2000);}
+}
+
+// INIT
+applyFilters();checkWorker();
+if(getWorkerUrl())document.getElementById('wcfg-inp').value=getWorkerUrl();
+</script>
+</body>
+</html>
